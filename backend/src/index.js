@@ -2,25 +2,25 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const http = require('http');
 const routes = require('./routes');
+const { setupWebsocker } = require('./websocket');
 
 dotenv.config();
 const { MONGO_URL } = process.env;
-console.log(MONGO_URL);
 
 const app = express();
-try {
-  mongoose.connect(MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-  });
-  console.log('connect to database');
-} catch (err) {
-  console.log('couldnt connect to database');
-}
+const server = http.Server(app);
+
+setupWebsocker(server);
+mongoose.connect(MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(routes);
 
-app.listen(3333);
+server.listen(3333);
